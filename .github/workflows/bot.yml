@@ -1,0 +1,74 @@
+name: SellPilot bot
+
+on:
+  schedule:
+    - cron: "23 5 * * *"     # every day 06:23 Central European time
+  workflow_dispatch:          # "Run the bot now" in the app
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: sellpilot-bot
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    environment:
+      name: github-pages
+    env:
+      POLAR_TOKEN: ${{ secrets.POLAR_TOKEN }}
+      POLAR_SERVER: ${{ vars.POLAR_SERVER || 'production' }}
+      PINTEREST_APP_ID: ${{ secrets.PINTEREST_APP_ID }}
+      PINTEREST_APP_SECRET: ${{ secrets.PINTEREST_APP_SECRET }}
+      PINTEREST_REFRESH_TOKEN: ${{ secrets.PINTEREST_REFRESH_TOKEN }}
+      PINTEREST_BOARD_ID: ${{ secrets.PINTEREST_BOARD_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check setup
+        run: |
+          if [ -z "$POLAR_TOKEN" ]; then
+            echo "### Add your Polar token first" >> "$GITHUB_STEP_SUMMARY"
+            echo "Settings > Secrets and variables > Actions > New repository secret: POLAR_TOKEN" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: bot/requirements.txt
+
+      - run: pip install -r bot/requirements.txt
+
+      - name: Make, sell, optimise, promote
+        working-directory: bot
+        run: python -m sellpilot run --site ../_site
+
+      - name: Keep the schedule alive (GitHub pauses schedules in quiet repos)
+        if: always()
+        run: |
+          git config user.name "sellpilot-bot"
+          git config user.email "sellpilot-bot@users.noreply.github.com"
+          git add bot/state/last_run.json 2>/dev/null || true
+          git diff --cached --quiet || (git commit -m "Bot run $(date -u +%F)" && git push) || true
+
+      - uses: actions/configure-pages@v5
+        if: always() && hashFiles('_site/index.html') != ''
+        with:
+          enablement: true
+        continue-on-error: true
+
+      - uses: actions/upload-pages-artifact@v3
+        if: always() && hashFiles('_site/index.html') != ''
+        with:
+          path: _site
+
+      - uses: actions/deploy-pages@v4
+        if: always() && hashFiles('_site/index.html') != ''
+        continue-on-error: true

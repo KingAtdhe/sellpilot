@@ -1,0 +1,18 @@
+{
+  "store_name": "Paper Pilot Studio",
+  "headline": "Printable planners for a calmer life",
+  "tagline": "Beautiful, practical printables you can download instantly, print at home or use on your tablet.",
+  "site_url": "https://kingatdhe.github.io/sellpilot/",
+  "currency": "usd",
+  "products_per_run": 3,
+  "max_products": 400,
+  "price_multiplier": 1.0,
+  "price_tests": true,
+  "raise_after_sales_30": 3,
+  "bundles": true,
+  "bundle_min_items": 3,
+  "campaigns": true,
+  "pins_per_run": 5,
+  "only_kinds": [],
+  "paused": false
+}

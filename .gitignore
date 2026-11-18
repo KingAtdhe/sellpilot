@@ -1,0 +1,7 @@
+node_modules/
+__pycache__/
+*.pyc
+out/
+_site/
+*.apk
+.DS_Store

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">SellPilot</string>
+    <string name="title_activity_main">SellPilot</string>
+    <string name="package_name">eu.sellpilot.app</string>
+    <string name="custom_url_scheme">eu.sellpilot.app</string>
+</resources>

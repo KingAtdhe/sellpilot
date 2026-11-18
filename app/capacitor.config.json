@@ -1,0 +1,6 @@
+{
+  "appId": "eu.sellpilot.app",
+  "appName": "SellPilot",
+  "webDir": "www",
+  "plugins": { "CapacitorHttp": { "enabled": true } }
+}
