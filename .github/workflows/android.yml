@@ -26,6 +26,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+          cache: gradle
       - name: Install and copy the app into Android
         run: |
           npm ci
@@ -34,7 +35,7 @@ jobs:
         working-directory: app/android
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleDebug --no-daemon || (echo 'retrying after download error'; sleep 60; ./gradlew assembleDebug --no-daemon) || (sleep 120; ./gradlew assembleDebug --no-daemon)
           cp app/build/outputs/apk/debug/app-debug.apk ../../SellPilot-${{ github.run_number }}.apk
       - uses: softprops/action-gh-release@v2
         with:
